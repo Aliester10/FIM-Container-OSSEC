@@ -1,6 +1,6 @@
 # 📘 OSSEC HIDS v3.7.0 Installation Guide
 
-Panduan ini mencakup instalasi **OSSEC Server** dan **Agent**, baik secara manual di sistem operasi maupun menggunakan container Docker.
+Panduan ini mencakup instalasi **OSSEC Server** dan **Agent**, baik secara manual di sistem operasi maupun menggunakan container Docker. Anda juga akan menemukan cara konfigurasi notifikasi email serta penggunaan format email HTML yang lebih rapi.
 
 ---
 
@@ -77,6 +77,81 @@ sudo usermod -a -G ossec www-data
 cd /var/ossec/bin/
 ./ossec-control start
 sudo systemctl restart apache2
+```
+
+---
+
+## ⚙️ Konfigurasi Email Notification OSSEC
+
+### 1. Tambahkan atau Ubah Bagian Berikut di Dalam Tag `<ossec_config>`
+
+Tambahkan konfigurasi berikut pada file konfigurasi OSSEC (`/var/ossec/etc/ossec.conf`):
+
+```xml
+<global>
+  <email_notification>yes</email_notification>
+  <email_to>tugasakhir20824@gmail.com</email_to>
+  <email_from>ossecm@faberttt</email_from>
+  <smtp_server>smtp.gmail.com</smtp_server>
+  <email_maxperhour>100</email_maxperhour>
+</global>
+
+<alerts>
+  <log_alert_level>7</log_alert_level>
+  <email_alert_level>7</email_alert_level>
+</alerts>
+```
+
+---
+
+## ✉️ (Opsional) Gunakan Email HTML (Lebih Rapi)
+
+Jika ingin mengubah format email menjadi HTML, lakukan langkah berikut:
+
+### 1. Tambahkan Command Custom
+
+Tambahkan konfigurasi berikut pada file `ossec.conf`, dalam tag `<ossec_config>`:
+
+```xml
+<command>
+  <name>html-email</name>
+  <executable>mail-html.sh</executable>
+  <expect>email</expect>
+</command>
+```
+
+### 2. Tambahkan Ke Rules
+
+Tambahkan rule berikut di file rules, misal pada `/var/ossec/etc/rules/local_rules.xml`:
+
+```xml
+<rule id="100001" level="10">
+  <decoded_as>syslog</decoded_as>
+  <options>alert_by_email</options>
+  <command>html-email</command>
+</rule>
+```
+
+### 3. Pastikan File mail-html.sh Sudah Ada dan Dapat Dieksekusi
+
+```bash
+chmod +x /var/ossec/active-response/bin/mail-html.sh
+```
+
+### 4. Restart OSSEC
+
+```bash
+sudo /var/ossec/bin/ossec-control restart
+```
+
+---
+
+## 🧪 Uji Coba Pengiriman Email
+
+### 1. Cek Log OSSEC
+
+```bash
+tail -f /var/ossec/logs/ossec.log
 ```
 
 ---
