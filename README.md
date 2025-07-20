@@ -195,6 +195,7 @@ cd /var/ossec/bin/
 ./manage_agents    # Masukkan key dari server
 ./ossec-control restart
 ```
+---
 
 # 📧 Konfigurasi Notifikasi Email OSSEC
 
